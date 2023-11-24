@@ -478,13 +478,18 @@ func empty[T Item[T]]() optionalItem[T] {
 // "greaterThan" or "lessThan" queries.
 func (n *node[T]) iterate(dir direction, start, stop optionalItem[T], includeStart bool, hit bool, iter ItemIterator[T]) (bool, bool) {
 	var ok, found bool
-	var index int
+	var index, stopIndex int
 	switch dir {
 	case ascend:
 		if start.valid {
 			index, _ = n.items.find(start.item)
 		}
-		for i := index; i < len(n.items); i++ {
+		if stop.valid {
+			stopIndex, _ = n.items.find(stop.item)
+		} else {
+			stopIndex = len(n.items)
+		}
+		for i := index; i < stopIndex; i++ {
 			if len(n.children) > 0 {
 				if hit, ok = n.children[i].iterate(dir, start, stop, includeStart, hit, iter); !ok {
 					return hit, false
@@ -495,15 +500,12 @@ func (n *node[T]) iterate(dir direction, start, stop optionalItem[T], includeSta
 				continue
 			}
 			hit = true
-			if stop.valid && !n.items[i].Less(stop.item) {
-				return hit, false
-			}
 			if !iter(n.items[i]) {
 				return hit, false
 			}
 		}
 		if len(n.children) > 0 {
-			if hit, ok = n.children[len(n.children)-1].iterate(dir, start, stop, includeStart, hit, iter); !ok {
+			if hit, ok = n.children[stopIndex].iterate(dir, start, stop, includeStart, hit, iter); !ok {
 				return hit, false
 			}
 		}
@@ -516,7 +518,15 @@ func (n *node[T]) iterate(dir direction, start, stop optionalItem[T], includeSta
 		} else {
 			index = len(n.items) - 1
 		}
-		for i := index; i >= 0; i-- {
+		if stop.valid {
+			stopIndex, found = n.items.find(stop.item)
+			if found {
+				stopIndex += 1
+			}
+		} else {
+			stopIndex = 0
+		}
+		for i := index; i >= stopIndex; i-- {
 			if start.valid && !n.items[i].Less(start.item) {
 				if !includeStart || hit || start.item.Less(n.items[i]) {
 					continue
@@ -527,16 +537,13 @@ func (n *node[T]) iterate(dir direction, start, stop optionalItem[T], includeSta
 					return hit, false
 				}
 			}
-			if stop.valid && !stop.item.Less(n.items[i]) {
-				return hit, false //	continue
-			}
 			hit = true
 			if !iter(n.items[i]) {
 				return hit, false
 			}
 		}
 		if len(n.children) > 0 {
-			if hit, ok = n.children[0].iterate(dir, start, stop, includeStart, hit, iter); !ok {
+			if hit, ok = n.children[stopIndex].iterate(dir, start, stop, includeStart, hit, iter); !ok {
 				return hit, false
 			}
 		}
