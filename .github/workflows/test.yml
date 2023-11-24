@@ -1,23 +1,26 @@
 ---
 name: Test
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - master
+  pull_request:
 jobs:
   test:
-    strategy:
-      matrix:
-        go-version:
-        - "1.21"
-        os:
-        - ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     steps:
     - name: Install Go
       uses: actions/setup-go@v3
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version: "1.21"
 
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Test
-      run: go test -v ./...
+      run: go test -coverprofile=coverage.txt -covermode=atomic -v ./...
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
