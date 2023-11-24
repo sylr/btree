@@ -1,11 +1,10 @@
-# BTree implementation for Go
+# sylr.dev/btree/v2 [![Go Reference](https://pkg.go.dev/badge/sylr.dev/btree/v2.svg)](https://pkg.go.dev/sylr.dev/btree/v2) [![codecov](https://codecov.io/gh/sylr/go-btree/graph/badge.svg?token=V222K9OAA4)](https://codecov.io/gh/sylr/go-btree)
 
-This package provides an in-memory B-Tree implementation for Go, useful as
-an ordered, mutable data structure.
+This package provides an in-memory B-Tree implementation for Go, useful as an
+ordered, mutable data structure.
 
-The API is based off of the wonderful
-https://pkg.go.dev/github.com/petar/GoLLRB/llrb, and is meant to allow btree to
-act as a drop-in replacement for gollrb trees.
+The API is based off of the wonderful https://pkg.go.dev/github.com/petar/GoLLRB/llrb,
+and is meant to allow btree to act as a drop-in replacement for gollrb trees.
 
 See https://pkg.go.dev/sylr.dev/btree/v2 for documentation.
 
